@@ -1,0 +1,311 @@
+html, body {
+  height: 100vh;
+  width: 100vw;
+}
+
+body {
+  font-family: 'Mada', sans-serif;
+  font-size: 16px;
+}
+
+body > div {
+  height: 100%;
+  width: 100%;
+}
+
+.app {
+  background-color: #f1f1f1;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+.app.disabled:after {
+  background-color: rgba(0, 0, 0, 0.5);
+  content: '';
+  display: block;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.error {
+  background-color: #fcf7b6;
+  border-bottom: solid 1px #d7d889;
+  border-top: solid 1px #d7d889;
+  padding: 1rem;
+  position: relative;
+  z-index: 11;
+  width: calc(100% - 2rem);
+}
+
+@media only screen and (min-width: 770px) {
+  .error {
+    font-size: 0.9rem;
+    padding: 0.25rem 1rem;
+  }
+}
+
+.error span,
+.error strong,
+.error em {
+  display: inline-block;
+}
+
+.error strong,
+.error em {
+  margin-left: 0.25rem;
+}
+
+.error span {
+  color: #b33a3a;
+}
+
+.error strong {
+  font-weight: bold;
+}
+
+.header {
+  align-items: center;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+}
+
+.header h1 a {
+  background: url(../../assets/svg/logo.svg) no-repeat;
+  background-size: cover;
+  display: block;
+  height: 70px;
+  overflow: hidden;
+  text-indent: -9999px;
+  width: 70px;
+}
+
+.recorder {
+  align-self: center;
+  border-radius: 10px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 16px 16px 70px 16px;
+  transition:
+    margin 0.25s linear,
+    width 0.25s linear;
+  width: calc(100% - 32px);
+}
+
+@media only screen and (min-width: 770px) {
+  .recorder {
+    margin: 60px 0;
+    width: 50%;
+  }
+}
+
+.content {
+  background-color: transparent;
+  border-radius: 10px 10px 0 0;
+  color: #e0e0e0;
+  font-size: 18px;
+  height: calc(70% - 34px);
+  overflow: auto;
+  padding: 16px;
+  transition:
+    background-color 0.5s linear,
+    color 0.25s linear;
+}
+
+.recorder.recorded .content {
+  background-color: #fff;
+  color: #444;
+}
+
+.controls {
+  background-color: #fff;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  height: calc(30% - 2px);
+  justify-content: center;
+  overflow: hidden;
+}
+
+.controls nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.controls h4 {
+  color: #bcbcbc;
+  font-size: 14px;
+  line-height: 14px;
+  padding-top: 16px;
+  position: relative;
+  text-align: center;
+  transition: color 0.5s linear;
+  z-index: 2;
+}
+
+.recorder.recording .controls h4 {
+  color: #fff;
+}
+
+.controls ul {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.controls li {
+  align-self: center;
+  display: flex;
+  position: relative;
+}
+
+.recorder:not(.empty) .controls li:not(:first-child) {
+  margin-left: 16px;
+}
+
+.controls li.record {
+  z-index: 1;
+}
+
+.controls li a,
+.controls li a:before,
+.controls li a span:before,
+.controls li a span:after {
+  border-radius: 50%;
+  display: block;
+}
+
+.controls li a {
+  font-size: 0;
+  height: 80px;
+  outline: 0;
+  width: 80px;
+  position: relative;
+  text-align: center;
+  transition:
+    height 0.5s linear,
+    width 0.5s linear;
+}
+
+.controls li.play a {
+  overflow: hidden;
+}
+
+.recorder .controls li.disabled a {
+  height: 0;
+  width: 0;
+}
+
+.recorder:not(.empty) .controls li a {
+  height: 50px;
+  width: 50px;
+}
+
+.recorder.playing .controls li.record a {
+  pointer-events: none;
+}
+
+.controls li a:before {
+  content: '';
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  transition:
+    background-color 0.25s linear,
+    transform 0.5s linear;
+  width: 100%;
+}
+
+.recorder.playing .controls li.record a:before {
+  background-color: #e0e0e0;
+}
+
+.controls li.record a:before {
+  background-color: #cb5042;
+}
+
+.controls li.record a:hover:before {
+  background-color: #aa2314;
+}
+
+.controls li.play a:before {
+  background-color: #0f3d4a;
+}
+
+.controls li.play a:hover:before {
+  background-color: #000;
+}
+
+.recorder.recording .controls li.record a:before {
+  transform: scale(10);
+}
+
+.recorder.recording:not(.empty) .controls li.record a:before {
+  transform: scale(20);
+}
+
+.controls li a span:before,
+.controls li a span:after {
+  content: '';
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.controls li a span:before {
+  transition: opacity 0.25s linear 0.25s, transform 0.25s linear 0.25s;
+}
+
+.controls li.record a span:before {
+  background: url(../../assets/svg/record.svg) no-repeat;
+}
+
+.controls li.play a span:before {
+  background: url(../../assets/svg/play.svg) no-repeat;
+}
+
+.recorder.recording .controls li.record a span:before,
+.recorder.playing .controls li.play a span:before {
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.25s linear, transform 0.25s linear;
+}
+
+.controls li.record a span:after,
+.controls li.play a span:after {
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.25s linear, transform 0.25s linear;
+}
+
+.controls li.record a span:after {
+  background: url(../../assets/svg/stop.svg) no-repeat;
+}
+
+.controls li.play a span:after {
+  background: url(../../assets/svg/pause.svg) no-repeat;
+}
+
+.recorder.recording .controls li.record a span:after,
+.recorder.playing .controls li.play a span:after {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.25s linear 0.25s, transform 0.25s linear 0.25s;
+}
+
+.player {
+  display: none;
+}
