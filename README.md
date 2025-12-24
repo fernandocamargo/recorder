@@ -600,12 +600,53 @@ build/
 
 #### Testing
 
+This project features a comprehensive test suite with **50 total tests** following a dual-layer testing strategy:
+
+---
+
+### Testing Strategy
+
+The test suite combines **unit tests** for implementation verification with **E2E tests** for user behavior verification, following [React Testing Library philosophy](https://testing-library.com/docs/guiding-principles/):
+
+| Test Type | Purpose | Count | Tool | Philosophy |
+|-----------|---------|-------|------|------------|
+| **Unit Tests** | Logic & Implementation | 37 ✅ | Jest | Test isolated functions, reducers, and utilities |
+| **E2E Tests** | User Behavior | 13 ✅ | Playwright | Test what users see and do, not implementation details |
+
+**Why this approach?**
+
+1. **Unit tests verify implementation correctness**: They test pure functions, reducers, time formatting, and state transformations in isolation
+2. **E2E tests verify user experience**: They test the complete application from a user's perspective - "Can I record audio?", "Does playback work?", "Is the UI responsive?"
+3. **No RTL component tests**: E2E tests already comprehensively cover user behavior. RTL component tests would be redundant and face React 16.2 + Recompose compatibility issues.
+
+> [!NOTE]
+> **React Testing Library Philosophy in E2E Tests**
+>
+> While this project uses React 16.2 (pre-Hooks), the E2E tests follow modern [React Testing Library principles](https://testing-library.com/docs/guiding-principles/):
+> - Tests interact with the UI as users would (clicking buttons, reading text)
+> - Tests verify what users see (timer display, button visibility)
+> - Tests don't touch implementation details (no state inspection, no internal methods)
+> - Tests use accessibility-focused selectors when possible
+>
+> The Playwright E2E suite serves as the user-behavior test layer that RTL typically provides for component testing.
+
+---
+
+### Running Tests
+
 **Unit Tests** (Jest):
 ```bash
 npm test
 ```
 
-**Test Runner**: Jest with jsdom environment
+**Features**:
+- **37 passing tests** covering:
+  - State reducers (11 tests) - [`reducers.test.js`](./src/components/app/__tests__/reducers.test.js)
+  - Initial state factory (10 tests) - [`initial-state.test.js`](./src/components/app/__tests__/initial-state.test.js)
+  - Time formatting utilities (8 tests) - [`format.test.js`](./src/helpers/time/format/__tests__/format.test.js)
+  - Number utilities (6 tests) - [`increase.test.js`](./src/helpers/number/increase/__tests__/increase.test.js)
+  - Component rendering (2 tests) - [`App.test.js`](./src/App.test.js)
+- Jest with jsdom environment
 - Watch mode by default
 - Coverage reports with `--coverage` flag
 
@@ -624,18 +665,24 @@ npm run test:e2e:ui
 npm run test:e2e:report
 ```
 
-**E2E Test Suite Features**:
-- 13 comprehensive tests covering complete user flows
+**Features**:
+- **13 passing tests** covering complete user flows:
+  - Initial state and UI visibility
+  - Recording workflow (start, timer, stop)
+  - Playback functionality (play, pause, progress)
+  - State transitions and CSS classes
+  - Mobile responsive design (375x667 viewport)
+  - Error handling
 - Automatic video recording of all test runs
 - Screenshot capture on failures
-- Fake media devices for consistent testing
-- Mobile viewport testing
-- See [`e2e/README.md`](./e2e/README.md) for details
+- Fake media devices for consistent testing (`--use-fake-device-for-media-stream`)
+- Cross-browser testing capability
+- See [`e2e/README.md`](./e2e/README.md) for detailed test documentation
 
 **Demo Videos**: Recorded test executions available in [`e2e/demo-videos/`](./e2e/demo-videos/)
-- `complete-recording-flow.webm` - Full user journey
-- `recording-and-playback.webm` - Recording and playback
-- `mobile-responsive.webm` - Mobile viewport (375x667)
+- `complete-recording-flow.webm` - Full user journey (empty → record → playback)
+- `recording-and-playback.webm` - Recording and playback focus
+- `mobile-responsive.webm` - Mobile viewport testing
 
 #### Eject Configuration
 
@@ -956,10 +1003,12 @@ export { default as stop } from './stop';
 
 - **Modular Architecture**: Clear separation of concerns with logic-free rendering
 - **Testability**: Pure functions, dependency injection, and presentational/container split
-- **Test Coverage**: 13 comprehensive E2E tests with Playwright covering all user flows
+- **Comprehensive Test Coverage**: 50 total tests (37 unit + 13 E2E) covering both implementation and user behavior
+- **Dual-Layer Testing Strategy**: Unit tests verify logic correctness, E2E tests verify user experience following RTL philosophy
+- **Automated Testing**: Playwright E2E tests with video recording and screenshot capture on failures
 - **Maintainability**: Well-organized directory structure with explicit prop contracts
 - **Declarative Code**: Render functions read as pure markup without logic noise
-- **Documentation**: Comprehensive inline documentation and test suite documentation
+- **Documentation**: Comprehensive README, inline documentation, and test suite documentation with links to all concepts
 
 ---
 
