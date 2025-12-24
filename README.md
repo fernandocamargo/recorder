@@ -26,6 +26,23 @@
 
 This application demonstrates a complete implementation of a browser-based audio recording solution using modern web APIs. The project showcases proficiency in functional programming patterns, state management, responsive design, and integration with native browser APIs.
 
+## Demo
+
+<div align="center">
+
+<video src="https://github.com/user-attachments/assets/complete-recording-flow.webm" width="800" controls autoplay loop muted>
+  <source src="./e2e/demo-videos/complete-recording-flow.webm" type="video/webm">
+  Your browser does not support the video tag. <a href="./e2e/demo-videos/complete-recording-flow.webm">Download the demo video</a>.
+</video>
+
+*Complete recording flow: Empty state → Recording → Playback → Pause*
+
+</div>
+
+> **Note**: The demo above shows automated E2E testing with fake media devices. The [live application](https://fernandocamargo.com/recorder/) uses your real microphone.
+>
+> **Additional demos**: [Recording & Playback](./e2e/demo-videos/recording-and-playback.webm) • [Mobile Responsive](./e2e/demo-videos/mobile-responsive.webm)
+
 ### Key Features
 
 - Real-time audio recording using the [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
@@ -583,6 +600,7 @@ build/
 
 #### Testing
 
+**Unit Tests** (Jest):
 ```bash
 npm test
 ```
@@ -590,6 +608,34 @@ npm test
 **Test Runner**: Jest with jsdom environment
 - Watch mode by default
 - Coverage reports with `--coverage` flag
+
+**End-to-End Tests** (Playwright):
+```bash
+# Run E2E tests (headless)
+npm run test:e2e
+
+# Run with visible browser
+npm run test:e2e:headed
+
+# Run with interactive UI
+npm run test:e2e:ui
+
+# View test report
+npm run test:e2e:report
+```
+
+**E2E Test Suite Features**:
+- 13 comprehensive tests covering complete user flows
+- Automatic video recording of all test runs
+- Screenshot capture on failures
+- Fake media devices for consistent testing
+- Mobile viewport testing
+- See [`e2e/README.md`](./e2e/README.md) for details
+
+**Demo Videos**: Recorded test executions available in [`e2e/demo-videos/`](./e2e/demo-videos/)
+- `complete-recording-flow.webm` - Full user journey
+- `recording-and-playback.webm` - Recording and playback
+- `mobile-responsive.webm` - Mobile viewport (375x667)
 
 #### Eject Configuration
 
@@ -647,6 +693,14 @@ The application gracefully handles unsupported browsers:
 
 ```
 recorder/
+├── e2e/                             # End-to-end tests
+│   ├── recorder.spec.js            # Playwright test suite (13 tests)
+│   ├── demo-videos/                # Recorded test executions
+│   │   ├── complete-recording-flow.webm
+│   │   ├── recording-and-playback.webm
+│   │   └── mobile-responsive.webm
+│   └── README.md                   # E2E test documentation
+│
 ├── public/                          # Static assets
 │   ├── index.html                  # HTML template
 │   ├── favicon.ico                 # Favicon
@@ -728,6 +782,8 @@ recorder/
 │           ├── play.svg          # Play icon
 │           └── pause.svg         # Pause icon
 │
+├── playwright.config.js          # Playwright E2E test configuration
+├── test-results/                 # Playwright test output (videos, screenshots)
 ├── .env                          # Environment configuration
 ├── .editorconfig                 # Editor settings
 ├── .gitignore                    # Git ignore rules
@@ -900,9 +956,10 @@ export { default as stop } from './stop';
 
 - **Modular Architecture**: Clear separation of concerns with logic-free rendering
 - **Testability**: Pure functions, dependency injection, and presentational/container split
+- **Test Coverage**: 13 comprehensive E2E tests with Playwright covering all user flows
 - **Maintainability**: Well-organized directory structure with explicit prop contracts
 - **Declarative Code**: Render functions read as pure markup without logic noise
-- **Documentation**: Comprehensive inline documentation
+- **Documentation**: Comprehensive inline documentation and test suite documentation
 
 ---
 
