@@ -54,6 +54,29 @@ This project was developed during a pivotal period in React's evolution:
 
 2. **Recompose at Its Peak**: [Recompose](https://github.com/acdlite/recompose) was the industry-standard solution for functional component composition. The library's creator, Andrew Clark, had already joined the React core team and would later create Hooks to solve the same problems that Recompose addressed.
 
+> [!IMPORTANT]
+> **Recompose: The Grandfather of Modern React**
+>
+> [Andrew Clark](https://github.com/acdlite) ([@acdlite](https://twitter.com/acdlite)) created Recompose in 2015 to bring functional programming patterns to React. After joining the React core team at Facebook, he became one of the principal architects behind **React Hooks**, which were announced in October 2018 and released in February 2019.
+>
+> **Hooks directly evolved from Recompose's patterns**:
+> - `withStateHandlers` → `useState` + `useReducer`
+> - `withProps` → `useMemo`
+> - `lifecycle` → `useEffect`
+> - `compose` → Custom Hooks composition
+>
+> In his own words from the [Hooks RFC](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884):
+>
+> _"Hooks solve all the problems I attempted to address with Recompose three years ago, and more on top of that."_ — Andrew Clark
+>
+> This project represents **the state-of-the-art functional React patterns of 2018**, built with the very library that inspired React's future direction. Understanding this codebase provides insight into the evolutionary path from HOCs to Hooks.
+>
+> **Further Reading**:
+> - [Introducing Hooks - React Conf 2018](https://www.youtube.com/watch?v=dpw9EHDh2bM) - Dan Abramov & Ryan Florence
+> - [React Hooks RFC Discussion](https://github.com/reactjs/rfcs/pull/68) - Original proposal with Andrew Clark's comments
+> - [Recompose Sunset Announcement](https://github.com/acdlite/recompose/commit/7867de653abbb57a49934e52622a60b433bda918) - Andrew Clark recommending Hooks migration
+> - [The History of React Hooks](https://www.youtube.com/watch?v=V-QO-KO90iQ) - Deep dive into the evolution
+
 3. **Functional Components Pattern**: While class components dominated stateful logic, this project demonstrates the advanced functional programming approach that was emerging as best practice for those seeking cleaner, more composable code.
 
 4. **HOC Composition**: Higher-Order Components (HOCs) were the recommended pattern for reusing component logic. This project exemplifies the sophisticated use of HOC composition through Recompose.
@@ -323,6 +346,82 @@ components/app/
 - [`src/components/app/props.js`](./src/components/app/props.js) - Computed props
 - [`src/components/app/events.js`](./src/components/app/events.js) - Lifecycle events
 
+#### Zero-Logic Rendering
+
+A critical architectural decision in this project is **keeping render functions completely free of business logic**. The render layer ([`render.js`](./src/components/app/render.js)) contains **only JSX interpolation** with zero transformations, calculations, or complex conditionals.
+
+**Pure Presentational Render** ([`src/components/app/render.js`](./src/components/app/render.js)):
+
+```javascript
+export default ({
+  error,
+  empty,
+  recorded,    // ✅ Computed in props.js
+  record,      // ✅ Command function from props.js
+  recording,
+  play,        // ✅ Command function from props.js
+  stopPlaying,
+  playing,
+  source,      // ✅ Blob URL created in props.js
+  counter,     // ✅ Formatted time from props.js
+  progress,
+}) => (
+  <div className={classnames('app', { disabled: !!error })}>
+    <header className="header">
+      <Brand />
+      <Warning error={error} />
+    </header>
+    <section className={classnames('recorder', { recorded, recording, playing, empty })}>
+      <Content />
+      <Controls
+        title={counter || 'Click to record & read the text'}
+        controls={[
+          { type: 'record', action: record, label: 'Record!' },
+          { type: 'play', action: play, disabled: !!empty, label: 'Play!' },
+        ]}
+      />
+      <Player playing={playing} source={source} currentTime={progress} onEnded={stopPlaying} />
+    </section>
+  </div>
+);
+```
+
+**All Logic Happens Before Rendering** ([`src/components/app/props.js`](./src/components/app/props.js)):
+
+```javascript
+export default props => {
+  const { recording, records, playing, startPlaying, pausePlaying, increaseProgress } = props;
+
+  return {
+    recorded: !!Object.keys(records).length,              // ✅ Derived boolean
+    source: Media.get(props),                             // ✅ Blob URL creation
+    counter: Counter.get(props),                          // ✅ Time formatting
+    record: () =>                                         // ✅ Command encapsulation
+      Recorder.get(props).then(
+        recording ? Recorder.stop(props) : Recorder.start(props),
+      ),
+    play: () => (playing ? pausePlaying() : startPlaying(increaseProgress)),
+  };
+};
+```
+
+**Key Principles**:
+
+1. **No Business Logic in JSX**: All calculations, transformations, and conditionals happen in [`props.js`](./src/components/app/props.js)
+2. **Command Pattern**: Event handlers are pre-built command functions, not inline arrow functions
+3. **Computed Properties**: Derived state like `recorded`, `source`, and `counter` are calculated before rendering
+4. **Declarative Markup**: Render function reads like pure HTML/JSX without logic noise
+5. **Testability**: Render function can be tested purely as JSX structure without mocking complex logic
+
+**Benefits**:
+- **Readability**: Render function is immediately understandable as UI structure
+- **Maintainability**: Logic changes don't require touching JSX
+- **Performance**: No function allocations or calculations during render phase
+- **Separation of Concerns**: Clear boundary between "what to show" (render.js) and "what to do" (props.js)
+- **Type Safety**: Props contract is explicit and verifiable
+
+This pattern predates React Hooks but demonstrates the same [separation of concerns](https://kentcdodds.com/blog/separation-of-concerns) that modern React encourages with custom hooks for logic and functional components for presentation.
+
 ### 6. Module Pattern for Organization
 
 Each helper/feature is self-contained with a clear public interface using the [Module Pattern](https://www.patterns.dev/vanilla/module-pattern).
@@ -354,9 +453,12 @@ recorder/
 #### Functional Programming
 - **[recompose](https://github.com/acdlite/recompose)** `^0.26.0` - Higher-Order Component utilities ([npm](https://www.npmjs.com/package/recompose/v/0.26.0))
   - [`compose`](https://github.com/acdlite/recompose/blob/master/docs/API.md#compose): Function composition
-  - [`withStateHandlers`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withstatehandlers): Local state management
-  - [`withProps`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withprops): Computed properties
-  - [`lifecycle`](https://github.com/acdlite/recompose/blob/master/docs/API.md#lifecycle): Lifecycle methods for functional components
+  - [`withStateHandlers`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withstatehandlers): Local state management (precursor to `useState`/`useReducer`)
+  - [`withProps`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withprops): Computed properties (precursor to `useMemo`)
+  - [`lifecycle`](https://github.com/acdlite/recompose/blob/master/docs/API.md#lifecycle): Lifecycle methods for functional components (precursor to `useEffect`)
+
+> [!NOTE]
+> Recompose's author, [Andrew Clark](https://github.com/acdlite), later joined the React core team and was instrumental in designing React Hooks. The patterns you see in this codebase directly influenced modern React's architecture.
 
 #### State Management
 - **[immutability-helper](https://github.com/kolodny/immutability-helper)** `^2.6.5` - Immutable state updates ([npm](https://www.npmjs.com/package/immutability-helper/v/2.6.5))
@@ -777,13 +879,15 @@ export { default as stop } from './stop';
 
 1. **Advanced Functional Programming**: Demonstrates mastery of HOC composition, currying, and pure functional patterns in React
 
-2. **Native API Integration**: Successfully integrated complex browser APIs (MediaRecorder, MediaStream) with React component lifecycle
+2. **Zero-Logic Rendering**: Strict separation between presentation (render.js) and logic (props.js), with render functions containing only JSX interpolation and no business logic
 
-3. **State Management**: Implemented Redux-like patterns without Redux, showing understanding of state management fundamentals
+3. **Native API Integration**: Successfully integrated complex browser APIs (MediaRecorder, MediaStream) with React component lifecycle
 
-4. **Responsive Design**: Mobile-first approach with smooth animations and state transitions
+4. **State Management**: Implemented Redux-like patterns without Redux, showing understanding of state management fundamentals
 
-5. **Progressive Web App**: Service worker implementation for offline capability
+5. **Responsive Design**: Mobile-first approach with smooth animations and state transitions
+
+6. **Progressive Web App**: Service worker implementation for offline capability
 
 ### Problem-Solving Examples
 
@@ -794,9 +898,10 @@ export { default as stop } from './stop';
 
 ### Code Quality
 
-- **Modular Architecture**: Clear separation of concerns
-- **Testability**: Pure functions and dependency injection
-- **Maintainability**: Well-organized directory structure
+- **Modular Architecture**: Clear separation of concerns with logic-free rendering
+- **Testability**: Pure functions, dependency injection, and presentational/container split
+- **Maintainability**: Well-organized directory structure with explicit prop contracts
+- **Declarative Code**: Render functions read as pure markup without logic noise
 - **Documentation**: Comprehensive inline documentation
 
 ---
@@ -806,9 +911,13 @@ export { default as stop } from './stop';
 ### React & Recompose
 
 - [React 16.x Roadmap](https://legacy.reactjs.org/blog/2018/11/27/react-16-roadmap.html) - Official React blog post
-- [Recompose GitHub Repository](https://github.com/acdlite/recompose) - Official repo and documentation
+- [Recompose GitHub Repository](https://github.com/acdlite/recompose) - Official repo and documentation by Andrew Clark
+- [React Hooks RFC](https://github.com/reactjs/rfcs/pull/68) - Original Hooks proposal with Andrew Clark's insights
+- [Introducing Hooks - React Conf 2018](https://www.youtube.com/watch?v=dpw9EHDh2bM) - Dan Abramov & Ryan Florence presentation
+- [Recompose Sunset Announcement](https://github.com/acdlite/recompose/commit/7867de653abbb57a49934e52622a60b433bda918) - Andrew Clark on migrating to Hooks
 - [How to migrate from Recompose to React Hooks](https://medium.com/stationfive/how-to-migrate-from-recompose-to-react-hooks-89b2981c03d) - Migration guide
 - [Why we decided to replace Recompose with React Hooks](https://www.rainforestqa.com/blog/2020-03-09-replacing-recompose-with-react-hooks) - Case study
+- [Andrew Clark's GitHub](https://github.com/acdlite) - Creator of Recompose, React core team member
 
 ### Browser APIs
 
