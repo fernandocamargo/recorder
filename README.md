@@ -28,10 +28,10 @@ This application demonstrates a complete implementation of a browser-based audio
 
 ### Key Features
 
-- Real-time audio recording using the MediaRecorder API
+- Real-time audio recording using the [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
 - Audio playback with progress tracking
 - Responsive design supporting both desktop and mobile devices
-- Progressive Web App (PWA) capabilities with service worker
+- [Progressive Web App (PWA)](https://web.dev/progressive-web-apps/) capabilities with [service worker](./src/registerServiceWorker.js)
 - Clean, accessible user interface with smooth animations
 - Immutable state management with predictable state transitions
 
@@ -67,10 +67,10 @@ This project was developed during a pivotal period in React's evolution:
 
 The architectural choices made in this project reflect the best practices and constraints of early 2018:
 
-- **No Hooks**: `useState`, `useEffect`, `useReducer` didn't exist yet
-- **Functional Components**: Forward-thinking choice when class components were standard
+- **No Hooks**: [`useState`](https://react.dev/reference/react/useState), [`useEffect`](https://react.dev/reference/react/useEffect), [`useReducer`](https://react.dev/reference/react/useReducer) didn't exist yet
+- **Functional Components**: Forward-thinking choice when [class components](https://react.dev/reference/react/Component) were standard
 - **Recompose HOCs**: Industry best practice for functional component composition
-- **Immutability Helper**: Common pattern for Redux-style reducers outside of Redux
+- **Immutability Helper**: Common pattern for [Redux](https://redux.js.org/)-style reducers outside of Redux
 - **Create React App**: De facto standard for React tooling and build configuration
 
 ---
@@ -143,7 +143,7 @@ Based on the design specifications provided in `/guideline/mocks/`:
 
 The application leverages the native [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder) for audio capture:
 
-**Implementation** (`src/helpers/media-recorder/create/index.js`):
+**Implementation** ([`src/helpers/media-recorder/create/index.js`](./src/helpers/media-recorder/create/index.js)):
 ```javascript
 export default ({ stream, ondataavailable }) =>
   Object.assign(new MediaRecorder(stream), {
@@ -159,7 +159,7 @@ export default ({ stream, ondataavailable }) =>
 
 #### 2. MediaStream API (getUserMedia)
 
-**Implementation** (`src/index.js:18-22`):
+**Implementation** ([`src/index.js:18-22`](./src/index.js#L18-L22)):
 ```javascript
 navigator.mediaDevices
   .getUserMedia({ audio: true })
@@ -169,30 +169,30 @@ navigator.mediaDevices
 ```
 
 **Capabilities**:
-- Request microphone access with user permission
+- Request microphone access with user permission via [`getUserMedia`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
 - Stream audio input to MediaRecorder
 - Error handling for permission denial
-- Promise-based asynchronous flow
+- [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)-based asynchronous flow
 
 #### 3. Blob API & Object URLs
 
-**Implementation** (`src/components/app/helpers/media/get/index.js`):
+**Implementation** ([`src/components/app/helpers/media/get/index.js`](./src/components/app/helpers/media/get/index.js)):
 ```javascript
 export default ({ playing, records, current }) =>
   playing && URL.createObjectURL(new Blob(records[current].chunks));
 ```
 
 **Purpose**:
-- Construct playable audio from recorded chunks
-- Create temporary URLs for `<audio>` element source
+- Construct playable audio from recorded chunks using [Blob API](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+- Create temporary URLs for `<audio>` element source via [`URL.createObjectURL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static)
 - Memory-efficient media handling
 
 #### 4. Service Worker API
 
-**PWA Implementation** (`src/registerServiceWorker.js`):
-- Offline capability through service worker registration
+**PWA Implementation** ([`src/registerServiceWorker.js`](./src/registerServiceWorker.js)):
+- Offline capability through [service worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) registration
 - Asset caching for improved performance
-- Progressive Web App features
+- [Progressive Web App](https://web.dev/progressive-web-apps/) features
 
 ---
 
@@ -200,9 +200,9 @@ export default ({ playing, records, current }) =>
 
 ### 1. Higher-Order Component (HOC) Composition
 
-The application uses Recompose to build components through HOC composition, a functional programming pattern for component enhancement.
+The application uses [Recompose](https://github.com/acdlite/recompose) to build components through [HOC composition](https://react.dev/reference/react/Component#alternatives), a functional programming pattern for component enhancement.
 
-**App Component Composition Pipeline** (`src/components/app/composition.js`):
+**App Component Composition Pipeline** ([`src/components/app/composition.js`](./src/components/app/composition.js)):
 
 ```javascript
 export default compose(
@@ -214,9 +214,9 @@ export default compose(
 
 **Pipeline Breakdown**:
 
-1. **`withStateHandlers`**: Injects state and state updaters (similar to `useState` + `useReducer`)
-2. **`withProps`**: Derives computed properties from state (similar to `useMemo`)
-3. **`lifecycle`**: Adds lifecycle methods (similar to `useEffect`)
+1. **[`withStateHandlers`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withstatehandlers)**: Injects state and state updaters (similar to [`useState`](https://react.dev/reference/react/useState) + [`useReducer`](https://react.dev/reference/react/useReducer))
+2. **[`withProps`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withprops)**: Derives computed properties from state (similar to [`useMemo`](https://react.dev/reference/react/useMemo))
+3. **[`lifecycle`](https://github.com/acdlite/recompose/blob/master/docs/API.md#lifecycle)**: Adds lifecycle methods (similar to [`useEffect`](https://react.dev/reference/react/useEffect))
 
 **Benefits**:
 - Pure functional components (no classes)
@@ -226,9 +226,9 @@ export default compose(
 
 ### 2. Flux-Like State Management
 
-The application implements a unidirectional data flow pattern inspired by Redux, without the Redux library.
+The application implements a [unidirectional data flow](https://react.dev/learn/passing-data-deeply-with-context) pattern inspired by [Redux](https://redux.js.org/), without the Redux library.
 
-**State Structure** (`src/components/app/initial-state.js`):
+**State Structure** ([`src/components/app/initial-state.js`](./src/components/app/initial-state.js)):
 
 ```javascript
 {
@@ -242,7 +242,7 @@ The application implements a unidirectional data flow pattern inspired by Redux,
 }
 ```
 
-**State Update Pattern** (`src/components/app/reducers.js`):
+**State Update Pattern** ([`src/components/app/reducers.js`](./src/components/app/reducers.js)):
 
 ```javascript
 export const startRecording = state => ({ uuid, recorder }) =>
@@ -255,16 +255,16 @@ export const startRecording = state => ({ uuid, recorder }) =>
 ```
 
 **Key Characteristics**:
-- Immutable updates using `immutability-helper`
-- MongoDB-style update syntax (`$set`, `$push`, `$apply`)
+- Immutable updates using [`immutability-helper`](https://github.com/kolodny/immutability-helper)
+- [MongoDB](https://www.mongodb.com/docs/manual/reference/operator/update/)-style update syntax ([`$set`](https://github.com/kolodny/immutability-helper#set), [`$push`](https://github.com/kolodny/immutability-helper#push), [`$apply`](https://github.com/kolodny/immutability-helper#apply))
 - Predictable state transitions
-- Single source of truth
+- [Single source of truth](https://redux.js.org/understanding/thinking-in-redux/three-principles#single-source-of-truth)
 
 ### 3. Command Pattern for User Actions
 
-User interactions are abstracted into command functions that encapsulate business logic.
+User interactions are abstracted into command functions that encapsulate business logic using the [Command Pattern](https://refactoring.guru/design-patterns/command).
 
-**Command Composition** (`src/components/app/props.js`):
+**Command Composition** ([`src/components/app/props.js`](./src/components/app/props.js)):
 
 ```javascript
 export default props => ({
@@ -284,9 +284,9 @@ export default props => ({
 
 ### 4. Functional Utilities Pattern
 
-Small, composable utility functions for common operations.
+Small, composable utility functions for common operations using [currying](https://javascript.info/currying-partials) and [function composition](https://www.freecodecamp.org/news/function-composition-in-javascript/).
 
-**Example: Curried Function Utility** (`src/helpers/function/use/index.js`):
+**Example: Curried Function Utility** ([`src/helpers/function/use/index.js`](./src/helpers/function/use/index.js)):
 
 ```javascript
 export default fn => ({
@@ -302,7 +302,7 @@ use(attribute('data')).to(updateRecording)
 
 ### 5. Presenter/Container Pattern
 
-Components are split into pure presentational (render) and container (logic) responsibilities.
+Components are split into pure [presentational and container](https://www.patterns.dev/react/presentational-container-pattern) responsibilities.
 
 **Example Structure**:
 ```
@@ -315,17 +315,30 @@ components/app/
 └── events.js        # Side effects
 ```
 
+**Files**:
+- [`src/components/app/index.js`](./src/components/app/index.js) - Component export
+- [`src/components/app/composition.js`](./src/components/app/composition.js) - HOC composition
+- [`src/components/app/render.js`](./src/components/app/render.js) - Presentational component
+- [`src/components/app/reducers.js`](./src/components/app/reducers.js) - State reducers
+- [`src/components/app/props.js`](./src/components/app/props.js) - Computed props
+- [`src/components/app/events.js`](./src/components/app/events.js) - Lifecycle events
+
 ### 6. Module Pattern for Organization
 
-Each helper/feature is self-contained with a clear public interface.
+Each helper/feature is self-contained with a clear public interface using the [Module Pattern](https://www.patterns.dev/vanilla/module-pattern).
 
-**Example**: `src/components/app/helpers/recorder/`
+**Example**: [`src/components/app/helpers/recorder/`](./src/components/app/helpers/recorder/)
 ```
 recorder/
 ├── get/index.js     # Get or create recorder instance
 ├── start/index.js   # Start recording
 └── stop/index.js    # Stop recording
 ```
+
+**Files**:
+- [`src/components/app/helpers/recorder/get/index.js`](./src/components/app/helpers/recorder/get/index.js)
+- [`src/components/app/helpers/recorder/start/index.js`](./src/components/app/helpers/recorder/start/index.js)
+- [`src/components/app/helpers/recorder/stop/index.js`](./src/components/app/helpers/recorder/stop/index.js)
 
 ---
 
@@ -334,56 +347,58 @@ recorder/
 ### Core Dependencies
 
 #### React Ecosystem
-- **react** `^16.2.0` - UI library
-- **react-dom** `^16.2.0` - DOM rendering
-- **react-scripts** `1.1.1` - Create React App tooling (Webpack, Babel, Jest)
+- **[react](https://www.npmjs.com/package/react/v/16.2.0)** `^16.2.0` - UI library ([docs](https://react.dev/))
+- **[react-dom](https://www.npmjs.com/package/react-dom/v/16.2.0)** `^16.2.0` - DOM rendering
+- **[react-scripts](https://www.npmjs.com/package/react-scripts/v/1.1.1)** `1.1.1` - [Create React App](https://create-react-app.dev/) tooling (Webpack, Babel, Jest)
 
 #### Functional Programming
-- **recompose** `^0.26.0` - Higher-Order Component utilities
-  - `compose`: Function composition
-  - `withStateHandlers`: Local state management
-  - `withProps`: Computed properties
-  - `lifecycle`: Lifecycle methods for functional components
+- **[recompose](https://github.com/acdlite/recompose)** `^0.26.0` - Higher-Order Component utilities ([npm](https://www.npmjs.com/package/recompose/v/0.26.0))
+  - [`compose`](https://github.com/acdlite/recompose/blob/master/docs/API.md#compose): Function composition
+  - [`withStateHandlers`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withstatehandlers): Local state management
+  - [`withProps`](https://github.com/acdlite/recompose/blob/master/docs/API.md#withprops): Computed properties
+  - [`lifecycle`](https://github.com/acdlite/recompose/blob/master/docs/API.md#lifecycle): Lifecycle methods for functional components
 
 #### State Management
-- **immutability-helper** `^2.6.5` - Immutable state updates
-  - MongoDB-style update operations
-  - Used in reducers for predictable state transitions
-  - Alternative to Immutable.js with simpler API
+- **[immutability-helper](https://github.com/kolodny/immutability-helper)** `^2.6.5` - Immutable state updates ([npm](https://www.npmjs.com/package/immutability-helper/v/2.6.5))
+  - [MongoDB](https://www.mongodb.com/docs/manual/reference/operator/update/)-style update operations
+  - Used in [reducers](./src/components/app/reducers.js) for predictable state transitions
+  - Alternative to [Immutable.js](https://immutable-js.com/) with simpler API
 
 #### Utilities
-- **classnames** `^2.2.5` - Dynamic CSS class composition
+- **[classnames](https://github.com/JedWatson/classnames)** `^2.2.5` - Dynamic CSS class composition ([npm](https://www.npmjs.com/package/classnames/v/2.2.5))
   - Conditional class application
   - Clean className construction
-- **prop-types** `^15.6.1` - Runtime type checking
+- **[prop-types](https://github.com/facebook/prop-types)** `^15.6.1` - Runtime type checking ([npm](https://www.npmjs.com/package/prop-types/v/15.6.1))
   - Component prop validation
   - Development-time warnings
 
 ### Build Tools & Configuration
 
-- **Create React App** `1.1.1` - Zero-configuration build setup
-  - Webpack 3.x
-  - Babel 6.x
-  - Jest for testing
-  - ESLint for linting
-  - PostCSS with Autoprefixer
-  - Development server with hot reloading
+- **[Create React App](https://create-react-app.dev/)** `1.1.1` - Zero-configuration build setup ([GitHub](https://github.com/facebook/create-react-app))
+  - [Webpack](https://webpack.js.org/) 3.x
+  - [Babel](https://babeljs.io/) 6.x
+  - [Jest](https://jestjs.io/) for testing
+  - [ESLint](https://eslint.org/) for linting
+  - [PostCSS](https://postcss.org/) with [Autoprefixer](https://github.com/postcss/autoprefixer)
+  - Development server with [hot reloading](https://webpack.js.org/concepts/hot-module-replacement/)
 
 ### CSS Strategy
 
-- **Plain CSS** with CSS Custom Properties (CSS Variables)
-- **BEM-like naming conventions** for component styles
-- **Mobile-first responsive design** with media queries
-- **Google Fonts**: Mada (Regular & Bold)
+- **Plain CSS** with [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) (CSS Variables)
+- **[BEM-like naming conventions](https://getbem.com/)** for component styles
+- **[Mobile-first responsive design](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Responsive/Mobile_first)** with [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries)
+- **[Google Fonts](https://fonts.google.com/specimen/Mada)**: Mada (Regular & Bold)
+
+**Stylesheet**: [`src/assets/css/theme.css`](./src/assets/css/theme.css)
 
 ### Browser APIs Used
 
-1. **MediaRecorder API** - Audio recording
-2. **MediaStream API** - Microphone access (`getUserMedia`)
-3. **Blob API** - Binary data handling
-4. **URL API** - Object URL creation (`createObjectURL`)
-5. **Service Worker API** - PWA offline support
-6. **localStorage** - (via service worker for caching)
+1. **[MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)** - Audio recording
+2. **[MediaStream API](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream)** - Microphone access ([`getUserMedia`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia))
+3. **[Blob API](https://developer.mozilla.org/en-US/docs/Web/API/Blob)** - Binary data handling
+4. **[URL API](https://developer.mozilla.org/en-US/docs/Web/API/URL)** - Object URL creation ([`createObjectURL`](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static))
+5. **[Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)** - PWA offline support
+6. **[Window.setInterval()](https://developer.mozilla.org/en-US/docs/Web/API/setInterval)** - Progress tracking timer
 
 ---
 
@@ -632,7 +647,7 @@ recorder/
 
 ### 1. Composition Over Inheritance
 
-The entire application is built using composition patterns rather than inheritance:
+The entire application is built using [composition patterns](https://react.dev/learn/thinking-in-react#step-1-break-the-ui-into-a-component-hierarchy) rather than [inheritance](https://react.dev/learn/thinking-in-react):
 
 **HOC Composition**:
 ```javascript
@@ -650,7 +665,7 @@ use(attribute('data')).to(updateRecording)
 
 ### 2. Single Responsibility Principle
 
-Each module has a single, well-defined responsibility:
+Each module has a single, well-defined responsibility following [SOLID principles](https://en.wikipedia.org/wiki/Single-responsibility_principle):
 
 - **Reducers**: Only transform state
 - **Props**: Only compute derived data
@@ -659,7 +674,7 @@ Each module has a single, well-defined responsibility:
 
 ### 3. Pure Functions
 
-Majority of the codebase consists of pure functions:
+Majority of the codebase consists of [pure functions](https://en.wikipedia.org/wiki/Pure_function):
 
 ```javascript
 // Pure: Same input always produces same output
@@ -675,7 +690,7 @@ export default ({ playing, records, current }) =>
 
 ### 4. Immutability
 
-All state updates are immutable:
+All state updates are [immutable](https://en.wikipedia.org/wiki/Immutable_object):
 
 ```javascript
 update(state, {
@@ -701,7 +716,7 @@ Clear boundaries between different aspects:
 
 ### 6. Dependency Injection
 
-HOCs inject dependencies through props:
+HOCs inject dependencies through props using [dependency injection pattern](https://en.wikipedia.org/wiki/Dependency_injection):
 
 ```javascript
 withStateHandlers(initialState, reducers)
@@ -713,7 +728,7 @@ withProps(props)
 
 ### 7. Factory Pattern
 
-MediaRecorder creation uses factory pattern:
+MediaRecorder creation uses [factory pattern](https://refactoring.guru/design-patterns/factory-method):
 
 ```javascript
 export default ({ stream, ondataavailable }) =>
@@ -724,7 +739,7 @@ export default ({ stream, ondataavailable }) =>
 
 ### 8. Command Pattern
 
-User actions encapsulated as commands:
+User actions encapsulated as commands using [command pattern](https://refactoring.guru/design-patterns/command):
 
 ```javascript
 record: () => Recorder.get(props).then(
@@ -734,7 +749,7 @@ record: () => Recorder.get(props).then(
 
 ### 9. Observer Pattern
 
-Event-driven architecture for MediaRecorder:
+Event-driven architecture for MediaRecorder using [observer pattern](https://refactoring.guru/design-patterns/observer):
 
 ```javascript
 MediaRecorder.create({
@@ -790,14 +805,29 @@ export { default as stop } from './stop';
 
 ### React & Recompose
 
-- [React 16.x Roadmap](https://legacy.reactjs.org/blog/2018/11/27/react-16-roadmap.html)
-- [How to migrate from Recompose to React Hooks](https://medium.com/stationfive/how-to-migrate-from-recompose-to-react-hooks-89b2981c03d)
-- [Why we decided to replace Recompose with React Hooks](https://www.rainforestqa.com/blog/2020-03-09-replacing-recompose-with-react-hooks)
+- [React 16.x Roadmap](https://legacy.reactjs.org/blog/2018/11/27/react-16-roadmap.html) - Official React blog post
+- [Recompose GitHub Repository](https://github.com/acdlite/recompose) - Official repo and documentation
+- [How to migrate from Recompose to React Hooks](https://medium.com/stationfive/how-to-migrate-from-recompose-to-react-hooks-89b2981c03d) - Migration guide
+- [Why we decided to replace Recompose with React Hooks](https://www.rainforestqa.com/blog/2020-03-09-replacing-recompose-with-react-hooks) - Case study
 
 ### Browser APIs
 
-- [MediaRecorder API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
-- [getUserMedia - MDN](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
+- [MediaRecorder API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder) - Complete API reference
+- [getUserMedia - MDN](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) - Media access documentation
+- [Service Worker API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) - PWA capabilities
+- [Blob API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/Blob) - Binary data handling
+
+### Design Patterns
+
+- [Refactoring Guru - Design Patterns](https://refactoring.guru/design-patterns) - Comprehensive pattern catalog
+- [Patterns.dev](https://www.patterns.dev/) - Modern web app patterns
+- [React Patterns](https://reactpatterns.com/) - React-specific patterns
+
+### Tools & Libraries
+
+- [Create React App Documentation](https://create-react-app.dev/) - Official CRA docs
+- [immutability-helper on GitHub](https://github.com/kolodny/immutability-helper) - State update utilities
+- [classnames on npm](https://www.npmjs.com/package/classnames) - CSS utility library
 
 ---
 
